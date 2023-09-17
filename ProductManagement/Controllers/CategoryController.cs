@@ -43,6 +43,8 @@ namespace ProductManagement.Controllers
             {
                 _db.Categories.Add(category);
                 _db.SaveChanges();
+                TempData["message"] = "Category created successfully";
+                TempData["status"] = "success";
                 return RedirectToAction("Index", "Category");
             }
             return View(category);
@@ -88,6 +90,8 @@ namespace ProductManagement.Controllers
             {
                 _db.Categories.Update(category);
                 _db.SaveChanges();
+                TempData["message"] = "Category updated successfully";
+                TempData["status"] = "warning";
                 return RedirectToAction("Index", "Category");
             }
             return View(category);
@@ -110,6 +114,8 @@ namespace ProductManagement.Controllers
             if (category == null) return NotFound();
             _db.Categories.Remove(category);
             _db.SaveChanges();
+            TempData["message"] = "Category deleted successfully";
+            TempData["status"] = "danger";
             return RedirectToAction("Index", "Category");
         }
     }
