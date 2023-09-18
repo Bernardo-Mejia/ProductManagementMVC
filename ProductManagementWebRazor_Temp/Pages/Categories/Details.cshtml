@@ -1,0 +1,49 @@
+﻿@page
+@model ProductManagementWebRazor_Temp.Pages.Categories.DetailsModel
+@{
+}
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Category</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            <i class="bi bi-key-fill"></i> @Html.DisplayNameFor(model => model.categories.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.categories.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.categories.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.categories.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.categories.DisplayOrder)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.categories.DisplayOrder)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.categories.CreatedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.categories.CreatedAt)
+        </dd>
+    </dl>
+</div>
+<div class="row">
+    <div class="col-6 col-md-3">
+        <a asp-Page="/Categories/Edit" asp-route-id="@Model.categories.Id" class="btn btn-primary form-control"><i class="bi bi-pencil-square"></i> Edit</a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a asp-page="/Categories/Index" class="btn btn-outline-secondary form-control"><i class="bi bi-box-arrow-left"></i> Back to List</a>
+    </div>
+</div>
