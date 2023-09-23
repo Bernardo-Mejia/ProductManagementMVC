@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ProductManagement.Data;
+using ProductManagement.DataAccess.Data;
 
 #nullable disable
 
-namespace ProductManagement.Migrations
+namespace ProductManagement.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230916205455_AddCategoryTabletoDB")]
-    partial class AddCategoryTabletoDB
+    [Migration("20230916214705_SeedCategoryTable")]
+    partial class SeedCategoryTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,6 +46,29 @@ namespace ProductManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2023, 9, 16, 15, 47, 5, 88, DateTimeKind.Local).AddTicks(1377),
+                            DisplayOrder = 1,
+                            Name = "Action"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2023, 9, 16, 15, 47, 5, 88, DateTimeKind.Local).AddTicks(1379),
+                            DisplayOrder = 2,
+                            Name = "Science"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2023, 9, 16, 15, 47, 5, 88, DateTimeKind.Local).AddTicks(1381),
+                            DisplayOrder = 3,
+                            Name = "History"
+                        });
                 });
 #pragma warning restore 612, 618
         }

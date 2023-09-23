@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ProductManagement.Data;
+using ProductManagement.DataAccess.Data;
 using ProductManagement.Models;
-using System.Collections.Generic;
 
 namespace ProductManagement.Controllers
 {

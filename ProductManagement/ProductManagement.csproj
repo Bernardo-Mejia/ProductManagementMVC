@@ -21,4 +21,8 @@
     <Folder Include="Views\NewFolder\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ProductManagement_DataAccess\ProductManagement_DataAccess.csproj" />
+  </ItemGroup>
+
 </Project>
