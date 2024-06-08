@@ -1,21 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProductManagement.DataAccess.Data;
+using ProductManagement_DataAccess.Repository.IRepository;
 using ProductManagement.Models;
+using ProductManagement_DataAccess.Repository;
 
 namespace ProductManagement.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db)
+        private readonly ICategoryRepository _categoryRepo;
+        public CategoryController(ICategoryRepository db)
         {
-            _db = db;
+            _categoryRepo = db;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            List<Category> categoryList = _db.Categories.ToList();
+            List<Category> categoryList = _categoryRepo.GetAll().ToList();
             return View(categoryList);
         }
 
@@ -32,15 +34,15 @@ namespace ProductManagement.Controllers
             if (category.Name != null)
             {
                 // Validate if the category name already exists
-                if (_db.Categories.Any(x => x.Name!.ToLower().Equals(category.Name!.ToLower())))
+                if (_categoryRepo.GetAll().Any(x => x.Name!.ToLower().Equals(category.Name!.ToLower())))
                     ModelState.AddModelError("", "This category already exists");
                 if (category.Name!.ToLower().Equals("test") || category.Name!.ToLower().Equals("tests"))
                     ModelState.AddModelError("", $"{category.Name} is not a valid name");
             }
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(category);
-                _db.SaveChanges();
+                _categoryRepo.Add(category);
+                _categoryRepo.Save();
                 TempData["message"] = "Category created successfully";
                 TempData["status"] = "success";
                 return RedirectToAction("Index", "Category");
@@ -53,7 +55,7 @@ namespace ProductManagement.Controllers
         {
             if (id == 0)
                 return RedirectToAction("Index", "Category");
-            Category category = _db.Categories.FirstOrDefault(x => x.Id == id)!;
+            Category category = _categoryRepo.Get(x => x.Id == id);
             if (category == null)
                 return NotFound();
             return View(category);
@@ -64,8 +66,8 @@ namespace ProductManagement.Controllers
         {
             if (id != 0)
             {
-                Category category = _db.Categories.FirstOrDefault(c => c.Id == id)!;
-                if(category == null)
+                Category category = _categoryRepo.Get(c => c.Id == id)!;
+                if (category == null)
                     return NotFound();
                 return View(category);
             }
@@ -76,31 +78,52 @@ namespace ProductManagement.Controllers
         {
             if (category == null)
                 return View(category);
-            if (category.Name != null)
+
+            if (string.IsNullOrEmpty(category.Name))
             {
-                // Validate if the category name already exists
-                if (_db.Categories.Any(x => x.Name!.ToLower().Equals(category.Name!.ToLower())))
-                    ModelState.AddModelError("", "This category already exists");
-                if (category.Name!.ToLower().Equals("test") || category.Name!.ToLower().Equals("tests"))
-                    ModelState.AddModelError("", $"{category.Name} is not a valid name");
+                ModelState.AddModelError("", "Category name cannot be empty");
+                return View(category);
             }
+
+            // Validate if the category name already exists
+            if (_categoryRepo.GetAll().Any(x => x.Name!.ToLower().Equals(category.Name!.ToLower()) && x.Id != category.Id))
+                ModelState.AddModelError("", "This category already exists");
+
+            if (category.Name!.ToLower().Equals("test") || category.Name!.ToLower().Equals("tests"))
+                ModelState.AddModelError("", $"{category.Name} is not a valid name");
+
             if (ModelState.IsValid)
             {
-                _db.Categories.Update(category);
-                _db.SaveChanges();
-                TempData["message"] = "Category updated successfully";
-                TempData["status"] = "warning";
-                return RedirectToAction("Index", "Category");
+                // Fetch the existing entity from the database
+                Category existingCategory = _categoryRepo.GetById(category.Id);
+                if (existingCategory != null)
+                {
+                    // Update the properties of the existing entity
+                    existingCategory.Name = category.Name;
+                    existingCategory.DisplayOrder = category.DisplayOrder;
+
+                    _categoryRepo.Update(existingCategory);
+                    _categoryRepo.Save();
+                    TempData["message"] = "Category updated successfully";
+                    TempData["status"] = "warning";
+                    return RedirectToAction("Index", "Category");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Category not found");
+                }
             }
+
             return View(category);
         }
+
 
         [HttpGet]
         public IActionResult Delete(int? id)
         {
-            if(id==0)
+            if (id == 0)
                 return RedirectToAction("Index", "Category");
-            Category category = _db.Categories.Find(id)!;
+            Category category = _categoryRepo.Get(x => x.Id == id);
             if (category == null) return NotFound();
             return View(category);
         }
@@ -108,10 +131,10 @@ namespace ProductManagement.Controllers
         public IActionResult DeletePOST(int? id)
         {
             if (id == 0) return NotFound();
-            Category category = _db.Categories.Where(c => c.Id.Equals(id)).FirstOrDefault()!;
+            Category category = _categoryRepo.Get(c => c.Id.Equals(id))!;
             if (category == null) return NotFound();
-            _db.Categories.Remove(category);
-            _db.SaveChanges();
+            _categoryRepo.Remove(category);
+            _categoryRepo.Save();
             TempData["message"] = "Category deleted successfully";
             TempData["status"] = "danger";
             return RedirectToAction("Index", "Category");

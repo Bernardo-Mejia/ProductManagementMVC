@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProductManagement.DataAccess.Data;
+using ProductManagement_DataAccess.Repository;
+using ProductManagement_DataAccess.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// Register Interface in Scoped
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 var app = builder.Build();
 
