@@ -18,16 +18,6 @@ namespace ProductManagement_DataAccess.Repository
             _db = db;
         }
 
-        public Category GetById(int id)
-        {
-            return _db.Categories.Find(id);
-        }
-
-        public void Save()
-        {
-            _db.SaveChanges();
-        }
-
         public void Update(Category obj)
         {
             _db.Categories.Update(obj);
