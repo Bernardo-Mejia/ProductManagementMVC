@@ -9,6 +9,7 @@ namespace ProductManagement_DataAccess.Repository.IRepository
     public interface IUnitOfWork
     {
         public ICategoryRepository CategoryRepository { get; }
+        public IProductRepository ProductRepository { get; }
 
         void Save();
     }
