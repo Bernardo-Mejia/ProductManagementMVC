@@ -4,8 +4,9 @@ using ProductManagement_DataAccess.Repository.IRepository;
 using ProductManagement.Models;
 using ProductManagement_DataAccess.Repository;
 
-namespace ProductManagement.Controllers
+namespace ProductManagement.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

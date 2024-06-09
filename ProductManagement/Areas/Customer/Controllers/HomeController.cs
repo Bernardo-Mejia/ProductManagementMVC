@@ -2,8 +2,9 @@
 using ProductManagement.Models;
 using System.Diagnostics;
 
-namespace ProductManagement.Controllers
+namespace ProductManagement.Areas.Customer.Controllers
 {
+    [Area("Customer")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
