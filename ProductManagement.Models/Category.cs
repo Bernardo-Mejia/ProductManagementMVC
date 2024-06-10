@@ -15,5 +15,7 @@ namespace ProductManagement.Models
         [Range(1, 1001, ErrorMessage = "{0} must be between {1}-{2}")]
         public int DisplayOrder { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        //public List<Product> Products { get; set; } = new();
     }
 }

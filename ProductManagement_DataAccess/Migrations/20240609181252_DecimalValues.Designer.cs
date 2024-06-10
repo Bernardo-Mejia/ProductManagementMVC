@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductManagement.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using ProductManagement.DataAccess.Data;
 namespace ProductManagement.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240609181252_DecimalValues")]
+    partial class DecimalValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,21 +52,21 @@ namespace ProductManagement.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 9, 22, 17, 14, 972, DateTimeKind.Local).AddTicks(3298),
+                            CreatedAt = new DateTime(2024, 6, 9, 12, 12, 52, 679, DateTimeKind.Local).AddTicks(4444),
                             DisplayOrder = 1,
                             Name = "Action"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 6, 9, 22, 17, 14, 972, DateTimeKind.Local).AddTicks(3319),
+                            CreatedAt = new DateTime(2024, 6, 9, 12, 12, 52, 679, DateTimeKind.Local).AddTicks(4446),
                             DisplayOrder = 2,
                             Name = "Science"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2024, 6, 9, 22, 17, 14, 972, DateTimeKind.Local).AddTicks(3326),
+                            CreatedAt = new DateTime(2024, 6, 9, 12, 12, 52, 679, DateTimeKind.Local).AddTicks(4447),
                             DisplayOrder = 3,
                             Name = "History"
                         });
@@ -80,9 +83,6 @@ namespace ProductManagement.DataAccess.Migrations
                     b.Property<string>("Author")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -110,8 +110,6 @@ namespace ProductManagement.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("Products");
 
                     b.HasData(
@@ -119,7 +117,6 @@ namespace ProductManagement.DataAccess.Migrations
                         {
                             Id = 1,
                             Author = "Humberto Eco",
-                            CategoryId = 9,
                             Description = "Valiéndose de las características propias de la novela gótica; la crónica medieval y la novela policíaca; el nombre de la rosa narra las actividades detectivescas de Guillermo de Baskerville; quien busca esclarecer los crímenes cometidos en una abadía benedictina en el año 1327.",
                             ISBN = "978-6073103008",
                             ListPrice = 55m,
@@ -132,7 +129,6 @@ namespace ProductManagement.DataAccess.Migrations
                         {
                             Id = 2,
                             Author = "Gabriel García Márquez",
-                            CategoryId = 4,
                             Description = "Muchos años después, frente al pelotón de fusilamiento, el coronel Aureliano Buendía había de recordar aquella tarde remota en que su padre lo llevó a conocer el hielo.",
                             ISBN = "978-6070728792",
                             ListPrice = 40m,
@@ -141,17 +137,6 @@ namespace ProductManagement.DataAccess.Migrations
                             Price50 = 25m,
                             Title = "Cien años de soledad"
                         });
-                });
-
-            modelBuilder.Entity("ProductManagement.Models.Product", b =>
-                {
-                    b.HasOne("ProductManagement.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }
