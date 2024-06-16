@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ProductManagement.Models;
+using ProductManagement.Models.ViewModels;
 using ProductManagement_DataAccess.Repository.IRepository;
 
 namespace ProductManagement.Areas.Admin.Controllers
@@ -14,27 +16,69 @@ namespace ProductManagement.Areas.Admin.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index() => View(_unitOfWork.ProductRepository.GetAll().ToList());
+        public IActionResult Index()
+        {
+            List<Product> productsList = _unitOfWork.ProductRepository.GetAll().ToList();
+            return View(productsList);
+        }
 
-        public IActionResult Create() => View();
+        public IActionResult Create()
+        {
+            IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepository.GetAll().Select(c => new SelectListItem
+            {
+                Text = c.Name,
+                Value = c.Id.ToString()
+            });
+
+            #region ViewData
+            /*
+            ViewData["CategoryList"] = categoryList;
+             <select asp-for="CategoryId" asp-items="@(ViewData["CategoryList"] as IEnumerable<SelectListItem>)" class="form-select border-0 shadow">
+                   <option disabled selected>-- Select Category --</option>
+             </select>
+             */
+            #endregion
+
+            #region ViewBag
+            //ViewBag.CategoryList = categoryList;
+            /*
+             <select asp-for="CategoryId" asp-items="ViewBag.CategoryList" class="form-select border-0 shadow">
+                   <option disabled selected>-- Select Category --</option>
+             </select>
+             */
+            #endregion
+
+            ProductVM productVM = new()
+            {
+                CategoryList = categoryList,
+                Product = new()
+            };
+
+            return View(productVM);
+        }
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        public IActionResult Create(ProductVM productVM)
         {
-            if (product == null)
-            {
-                return View(product);
-            }
-
             if (ModelState.IsValid)
             {
-                _unitOfWork.ProductRepository.Add(product);
+                _unitOfWork.ProductRepository.Add(productVM.Product);
                 _unitOfWork.Save();
                 TempData["message"] = "Product created successfully";
                 TempData["status"] = "success";
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            else
+            {
+                productVM.CategoryList = _unitOfWork.CategoryRepository.GetAll().Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                });
+                TempData["message"] = "Please, validate data";
+                TempData["status"] = "warning";
+            }
+            return View(productVM);
         }
 
         public IActionResult Edit(int id)
