@@ -11,10 +11,12 @@ namespace ProductManagement.Areas.Admin.Controllers
     public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(IUnitOfWork unitOfWork)
+        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -24,7 +26,7 @@ namespace ProductManagement.Areas.Admin.Controllers
         }
 
         #region This will be replaced by Upsert method
-        
+
         [Obsolete]
         public IActionResult Create()
         {
@@ -118,7 +120,7 @@ namespace ProductManagement.Areas.Admin.Controllers
             }
             return View(product);
         }
-        
+
         #endregion End Create/Edit
 
         public IActionResult Upsert(int? id)
@@ -149,10 +151,49 @@ namespace ProductManagement.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.ProductRepository.Add(productVM.Product);
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    if (!String.IsNullOrEmpty(productVM.Product.ImageUrl))
+                    {
+                        // Delete Old Image
+                        string oldPathImage = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldPathImage))
+                        {
+                            System.IO.File.Delete(oldPathImage);
+                        }
+                    }
+
+                    using (FileStream fileStream = new(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+                    productVM.Product.ImageUrl = @"\images\product\" + fileName;
+                }
+
+                string messageData = String.Empty,
+                    statusData = String.Empty;
+
+                if (productVM.Product.Id == 0)
+                {
+                    _unitOfWork.ProductRepository.Add(productVM.Product);
+                    messageData = $"Product created successfully";
+                    statusData = $"success";
+                }
+                else
+                {
+                    messageData = $"Product updated successfully";
+                    statusData = $"warning";
+                    _unitOfWork.ProductRepository.Update(productVM.Product);
+                }
+
                 _unitOfWork.Save();
-                TempData["message"] = $"Product {(productVM.Product.Id != 0 ? "updated" : "created")} successfully";
-                TempData["status"] = $"{(productVM.Product.Id == 0 ? "success" : "warning")}";
+                TempData["message"] = messageData;
+                TempData["status"] = statusData;
                 return RedirectToAction(nameof(Index));
             }
             else
