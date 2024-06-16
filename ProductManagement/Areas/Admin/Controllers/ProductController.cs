@@ -21,7 +21,7 @@ namespace ProductManagement.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            List<Product> productsList = _unitOfWork.ProductRepository.GetAll().ToList();
+            List<Product> productsList = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category").ToList();
             return View(productsList);
         }
 
