@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProductManagement.Models;
 using ProductManagement.Models.ViewModels;
@@ -22,6 +23,9 @@ namespace ProductManagement.Areas.Admin.Controllers
             return View(productsList);
         }
 
+        #region This will be replaced by Upsert method
+        
+        [Obsolete]
         public IActionResult Create()
         {
             IEnumerable<SelectListItem> categoryList = _unitOfWork.CategoryRepository.GetAll().Select(c => new SelectListItem
@@ -58,6 +62,7 @@ namespace ProductManagement.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Obsolete]
         public IActionResult Create(ProductVM productVM)
         {
             if (ModelState.IsValid)
@@ -81,6 +86,7 @@ namespace ProductManagement.Areas.Admin.Controllers
             return View(productVM);
         }
 
+        [Obsolete]
         public IActionResult Edit(int id)
         {
             if (id != 0)
@@ -95,6 +101,7 @@ namespace ProductManagement.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Obsolete]
         public IActionResult Edit(Product product)
         {
             if (product == null)
@@ -110,6 +117,56 @@ namespace ProductManagement.Areas.Admin.Controllers
                 return RedirectToAction("Index", "Product");
             }
             return View(product);
+        }
+        
+        #endregion End Create/Edit
+
+        public IActionResult Upsert(int? id)
+        {
+            ProductVM productVM = new()
+            {
+                CategoryList = _unitOfWork.CategoryRepository.GetAll().Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                }),
+                Product = new()
+            };
+
+            if (id == null || id == 0)
+                // Create
+                return View(productVM);
+            else
+            {
+                // Update
+                productVM.Product = _unitOfWork.ProductRepository.Get(p => p.Id == id);
+                return View(productVM);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
+        {
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.ProductRepository.Add(productVM.Product);
+                _unitOfWork.Save();
+                TempData["message"] = $"Product {(productVM.Product.Id != 0 ? "updated" : "created")} successfully";
+                TempData["status"] = $"{(productVM.Product.Id == 0 ? "success" : "warning")}";
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                productVM.CategoryList = _unitOfWork.CategoryRepository.GetAll().Select(c => new SelectListItem
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                });
+                TempData["message"] = "Please, validate data";
+                TempData["status"] = "warning";
+
+                return View(productVM);
+            }
         }
 
         public IActionResult Delete(int id)
