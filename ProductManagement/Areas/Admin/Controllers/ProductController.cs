@@ -210,6 +210,9 @@ namespace ProductManagement.Areas.Admin.Controllers
             }
         }
 
+        #region Replace with HttpDelete
+        /*
+        [Obsolete]
         public IActionResult Delete(int id)
         {
             if (id == 0)
@@ -218,6 +221,7 @@ namespace ProductManagement.Areas.Admin.Controllers
             if (product == null) return NotFound();
             return View(product);
         }
+        [Obsolete]
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? id)
         {
@@ -230,6 +234,41 @@ namespace ProductManagement.Areas.Admin.Controllers
             TempData["status"] = "danger";
             return RedirectToAction("Index", "Product");
         }
+        */
+        #endregion
+
+        #region API
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            List<Product> products = _unitOfWork.ProductRepository.GetAll(includeProperties: "Category").ToList();
+            return Json(new { data = products });
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            if (id == 0) return NotFound();
+            Product product = _unitOfWork.ProductRepository.Get(c => c.Id.Equals(id))!;
+            if (product == null) return NotFound();
+
+            string oldPathImage = Path.Combine(_webHostEnvironment.WebRootPath, product.ImageUrl.TrimStart('\\'));
+            if (System.IO.File.Exists(oldPathImage))
+            {
+                System.IO.File.Delete(oldPathImage);
+            }
+
+            _unitOfWork.ProductRepository.Remove(product);
+            _unitOfWork.Save();
+            //TempData["message"] = "Product deleted successfully";
+            //TempData["status"] = "danger";
+            //return RedirectToAction("Index", "Product");
+
+            return Json(new { success = true, message = "Delete Succesfully" });
+        }
+
+        #endregion
 
     }
 }
