@@ -56,6 +56,13 @@ namespace ProductManagement_DataAccess.Repository
             return query.ToList();
         }
 
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        {
+            IQueryable<T> query = dbSet;
+            query = query.Where(filter);
+            return query.ToList();
+        }
+
         public void Remove(T entity)
         {
             dbSet.Remove(entity);

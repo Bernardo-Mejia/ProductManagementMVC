@@ -3,6 +3,7 @@ using ProductManagement.DataAccess.Data;
 using ProductManagement_DataAccess.Repository.IRepository;
 using ProductManagement.Models;
 using ProductManagement_DataAccess.Repository;
+using ProductManagement.Models.ViewModels;
 
 namespace ProductManagement.Areas.Admin.Controllers
 {
@@ -56,10 +57,17 @@ namespace ProductManagement.Areas.Admin.Controllers
         {
             if (id == 0)
                 return RedirectToAction("Index", "Category");
-            Category category = _unitOfWork.CategoryRepository.Get(x => x.Id == id);
-            if (category == null)
+
+            CategoryVM categoryVM = new CategoryVM()
+            {
+                Category = _unitOfWork.CategoryRepository.Get(x => x.Id == id),
+                Products = _unitOfWork.ProductRepository.GetAll(x => x.CategoryId == id).ToList(),
+            };
+
+            //Category category = _unitOfWork.CategoryRepository.Get(x => x.Id == id);
+            if (categoryVM.Category == null)
                 return NotFound();
-            return View(category);
+            return View(categoryVM);
         }
 
         [HttpGet]
