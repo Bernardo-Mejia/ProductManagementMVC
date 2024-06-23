@@ -4,6 +4,8 @@ using ProductManagement_DataAccess.Repository;
 using ProductManagement_DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Identity;
 using ProductManagement.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using ProductManagement.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,10 +22,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
+// Chango AddDefaultIdentity -> AddIdentity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 // Register Interface in Scoped
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+// EmailSender
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
