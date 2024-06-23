@@ -2,11 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using ProductManagement.DataAccess.Data;
 using ProductManagement_DataAccess.Repository;
 using ProductManagement_DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// For _LoginPartial to map Razor Pages
+builder.Services.AddRazorPages();
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
@@ -14,6 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Register Interface in Scoped
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -32,9 +38,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
+// For _LoginPartial to map Razor Pages
+app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
