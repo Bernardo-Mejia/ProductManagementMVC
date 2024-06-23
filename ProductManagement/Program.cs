@@ -3,6 +3,7 @@ using ProductManagement.DataAccess.Data;
 using ProductManagement_DataAccess.Repository;
 using ProductManagement_DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Identity;
+using ProductManagement.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
