@@ -22,8 +22,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Chango AddDefaultIdentity -> AddIdentity
+// Change AddDefaultIdentity -> AddIdentity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+// Must be after Identity Configuration
+builder.Services.ConfigureApplicationCookie(options => {
+    options.LoginPath = $"/Identity/Account/Login";
+    options.LogoutPath = $"/Identity/Account/Logout";
+    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+});
 
 // Register Interface in Scoped
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -4,10 +4,13 @@ using ProductManagement_DataAccess.Repository.IRepository;
 using ProductManagement.Models;
 using ProductManagement_DataAccess.Repository;
 using ProductManagement.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using ProductManagement.Utility;
 
 namespace ProductManagement.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
